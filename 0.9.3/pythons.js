@@ -2348,6 +2348,16 @@ function auto_conf(cfg) {
         }
     }
 
+    // self-hosted CDN support: the wheel package installer (aio/pep0723.py)
+    // reads the PYGPI env var to override the package index URL and the
+    // wheel download base. Both default to the upstream CDN otherwise.
+    // Derive this deployment's root from pythons.js own location; an
+    // explicit ?PYGPI= url parameter takes precedence when present.
+    // NOTE: re-port this block when bumping the pygbag version.
+    if (!vm.cpy_argv.some( (a) => a.startsWith("PYGPI") )) {
+        vm.cpy_argv.push( "PYGPI=" + new URL( "../", import.meta.url ).href )
+    }
+
     // running pygbag proxy, lan testing or a module url ?
     if ( (location.hostname === "localhost") || cfg.module) {
         config.cdn = url.split("?",1)[0].replace(module_name, "")
